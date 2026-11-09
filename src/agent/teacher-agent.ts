@@ -194,7 +194,8 @@ function baseAgentOptions(kind: AgentKind, opts: AgentBuildOptions, tools: Agent
 	const lastInput = opts.messages?.at(-1);
 	let answerReactionOwed = kind !== "practice" && lastInput?.role === "toolResult" &&
 		!lastInput.isError && (QUESTION_TOOLS as readonly string[]).includes(lastInput.toolName) &&
-		needsContinuation((opts.messages ?? []) as LhMessage[]);
+		// The UI-only plan-block marker sits between plan_init's quiz call and its result.
+		needsContinuation(((opts.messages ?? []) as LhMessage[]).filter((m) => (m as { customType?: string }).customType !== "plan-block"));
 	let recoveredEmptyResponse = false;
 	const agent = new Agent({
 		identity: APP_IDENTITY,
